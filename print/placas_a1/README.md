@@ -18,7 +18,10 @@ Faltan a propósito la cabeza (con las antenas, los ojos, el proyector y el parl
 cuerpo (`body_*` y `battery_pack_lid`), porque en este robot se reemplazan.
 
 Relleno según [`docs/print_guide.md`](../../docs/print_guide.md): 15 % en PLA y 40 % en TPU. Conviene
-laminar con soportes en árbol; la pieza con más voladizo es `trunk_top`.
+laminar con soportes en árbol (la pieza con más voladizo es `trunk_top`) y con brim de 5 mm alrededor de
+cada pieza (`brim_type` en `outer_only`). El brim automático de Bambu casi no agrega nada en PLA, y la
+placa de caderas se despegó en la capa 6: ocho de sus piezas miden ~30 mm de alto y apoyan 186–269 mm².
+Si igual se levantan los bordes, lavá la placa con agua y detergente y bajá la primera capa a 30 mm/s.
 
 `placas.png` muestra las placas vistas desde arriba, con la altura de cada pieza en mm.
 
@@ -28,6 +31,10 @@ laminar con soportes en árbol; la pieza con más voladizo es `trunk_top`.
 Se queda con la que deja menos voladizo (caras inclinadas más de 45° hacia abajo que no tocan la cama),
 con un pequeño premio por el área apoyada. Después gira cada pieza para que ocupe el menor rectángulo
 posible y las acomoda en filas, con 12 mm de borde y 8 mm entre piezas.
+
+Las tapas de rodilla (`left_cache`, `right_cache`) se orientan a mano, con `BASE_FIJA`. Con el puntaje
+quedaban paradas: 153 mm de alto y la primera capa sin tocar la cama. Acostadas sobre la cara exterior
+plana apoyan 6250 mm² y miden 40 mm de alto.
 
 Para regenerarlas, desde esta carpeta:
 

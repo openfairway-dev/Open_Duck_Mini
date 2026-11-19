@@ -2,7 +2,7 @@
 
 Orientación: prueba como base las 10 caras planas más grandes y la orientación original, y elige la
 que deja menos voladizo (caras con más de 45° hacia abajo fuera de la cama) menos un 20 % del área
-apoyada; si empatan, la más baja.
+apoyada; si empatan, la más baja. Las piezas de BASE_FIJA se apoyan sobre la cara elegida a mano.
 Uso: python placas_a1.py <carpeta print/> <carpeta salida>
 """
 import os
@@ -33,6 +33,11 @@ PLACAS = {
     "7_tapas_rodilla": {"left_cache": 1, "right_cache": 1},
 }
 
+# Dirección (en las coordenadas del STL) de la cara que va contra la cama. Las tapas de rodilla, con el
+# puntaje, quedaban paradas: 153 mm de alto y la primera capa sin tocar la cama. Acostadas sobre la cara
+# exterior plana apoyan 6336 mm² y miden 40 mm.
+BASE_FIJA = {"left_cache": [0.0, 1.0, 0.0], "right_cache": [0.0, -1.0, 0.0]}
+
 
 def puntaje(m):
     fn, c, a = m.face_normals, m.triangles_center, m.area_faces
@@ -41,9 +46,13 @@ def puntaje(m):
     return voladizo, apoyo
 
 
-def orientar(m):
-    normales = [m.facets_normal[i] for i in np.argsort(m.facets_area)[::-1][:10]]
-    normales.append(np.array([0.0, 0.0, -1.0]))
+def orientar(m, nombre):
+    if nombre in BASE_FIJA:
+        # la cara plana más parecida a la dirección pedida
+        normales = [m.facets_normal[np.argmax(m.facets_normal @ np.array(BASE_FIJA[nombre]))]]
+    else:
+        normales = [m.facets_normal[i] for i in np.argsort(m.facets_area)[::-1][:10]]
+        normales.append(np.array([0.0, 0.0, -1.0]))
     mejor = None
     for n in normales:
         mm = m.copy()
@@ -107,7 +116,7 @@ def main(carpeta, salida):
     for k, (placa, contenido) in enumerate(PLACAS.items()):
         piezas = []
         for nombre, cant in contenido.items():
-            m, vol, apo = orientar(trimesh.load(os.path.join(carpeta, nombre + ".stl")))
+            m, vol, apo = orientar(trimesh.load(os.path.join(carpeta, nombre + ".stl")), nombre)
             print(f"  {nombre:26s} {m.extents[0]:5.1f} x {m.extents[1]:5.1f} x {m.extents[2]:5.1f}"
                   f"  apoyo {apo:5.0f} mm2  voladizo {vol:5.0f} mm2")
             piezas += [(nombre if cant == 1 else f"{nombre}#{i + 1}", m) for i in range(cant)]
